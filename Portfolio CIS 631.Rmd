@@ -10,6 +10,27 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
+this is my final project portfolio for CIS 631
+
+course objectives looking to demonstrate:
+
+-Describe probability as a foundation of statistical modeling, including inference and maximum likelihood estimation
+
+-Determine and apply the appropriate generalized linear model for a specific data context
+
+linear, trying to fit some sort of a line for some link function 
+explore the data and then say the data means this so thats why I chose this model
+
+
+-Conduct model selection for a set of candidate models
+
+
+-Communicate the results of statistical models to a general audience
+
+
+-Use programming software (i.e., R) to fit and assess statistical models
+** will demonstrate with this portfolio project being coded in R
+
 
 ```{r cars}
 summary(cars)
