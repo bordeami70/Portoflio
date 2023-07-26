@@ -1,0 +1,24 @@
+---
+title: "Portfolio CIS 631"
+author: "Michael Bordeaux"
+date: "7/26/2023"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r cars}
+summary(cars)
+```
+
+
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+\
