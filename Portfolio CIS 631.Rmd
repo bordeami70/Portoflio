@@ -2,44 +2,123 @@
 title: "Portfolio CIS 631"
 author: "Michael Bordeaux"
 date: "7/26/2023"
-output: pdf_document
+output:
+  html_document:
+    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(tidymodels)
 ```
 
 
-this is my final project portfolio for CIS 631
+this is my final project portfolio for CIS 631, in this document I will demonstrate my knowledge of each course objective:
 
-course objectives looking to demonstrate:
+
 
 -Describe probability as a foundation of statistical modeling, including inference and maximum likelihood estimation
 
--Determine and apply the appropriate generalized linear model for a specific data context
+# Course Objective:
+
+## Determine and apply the appropriate generalized linear model for a specific data context
+
+### showing the course objective:
+
+for this learning objective activity 6 is demonstrating using the appropriate glm for a specfic data context.
+```{r include=FALSE}
+
+
+url <- "https://www.openintro.org/data/csv/resume.csv"
+
+resume <- read_csv(url)
+
+
+```
+exploratory analysis on received_callback variable:
+```{r}
+ggplot(resume, aes(x = received_callback)) +
+  geom_bar() +
+  labs(x = "Received Callback", y = "Count")
+
+
+```
+
+
+By looking at the above graph we can see that a majority of these resumes did not receive callbacks.
+
+```{r}
+
+resume$received_callback <- factor(resume$received_callback, labels = c("No", "Yes"))
+
+table_data <- table(resume$received_callback)
+total <- sum(table_data)
+percent <- prop.table(table_data) * 100
+
+table_df <- data.frame(
+  received_callback = levels(resume$received_callback),
+  n = table_data,
+  percent = percent
+)
+
+print(table_df)
+
+```
+
+looking at the table above our probablity of a "Yes" is only 8% with an odds .08/(1-.08) of roughly 8% also.
+
+we can further explore this data by adding race into it:
+
+Calculating the probability of a randomly selected person percieved as black it would be ~6% and the odds of a randomly selected resume of a person percieved as black being
+called back is .06/(1-.06) roughly also 6%
+```{r}
+# The {tidymodels} method for logistic regression requires that the response be a factor variable
+resume <- resume %>% 
+  mutate(received_callback = as.factor(received_callback))
+
+resume_mod <- logistic_reg() %>%
+  set_engine("glm") %>%
+  fit(received_callback ~ race, data = resume, family = "binomial")
+
+tidy(resume_mod) %>% 
+  knitr::kable(digits = 3)
+```
+
+regression equation :
+
+y= -2.675 + .438*X + E
+
+to simplify this and look at the equation for corresponding to resumes/persons perceived as black we'd right it as:
+y= -2.675 + E
+
+the logg-odds would be: -2.675
+
+and the odds they would be called back is 
+roughly .069 or exp(-2.675)
+
+and the probability is .064 of getting called back
 
 linear, trying to fit some sort of a line for some link function 
 explore the data and then say the data means this so thats why I chose this model
 
 
+
+# Describing the learning objective "Determine and apply the appropriate generalized linear model for a specific data context":
+
+For this learning objective I am using activity 6 to show the determining and applying the appropriate generalized linear model. For this data set it is appropriate to use logistic regression because we have a binary outcome variable. The variable is received_callback which is either a 1 for yes or 0 for no that indicates if a person who submitted there resume received a callback. For the application of this model you can see I first used exploratory graphs to get an understanding of my data set. I think created a table to further analyze my data before approaching this problem. After the initial analysis and more calculating probability and odds I then fit the logistic regression model using glm and passing the binomial attribute. 
+
+
 -Conduct model selection for a set of candidate models
 
 
--Communicate the results of statistical models to a general audience
+-Communicate the results of statistical models to a general audience **possibly use the miniproject #1 here?
+
 
 
 -Use programming software (i.e., R) to fit and assess statistical models
+
 ** will demonstrate with this portfolio project being coded in R
 
 
-```{r cars}
-summary(cars)
-```
 
-
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-\
