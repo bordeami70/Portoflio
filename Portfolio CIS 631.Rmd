@@ -12,6 +12,8 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(tidymodels)
 library(forecast)
+library(GGally)
+
 ```
 
 
@@ -19,15 +21,15 @@ this is my final project portfolio for CIS 631, in this document I will demonstr
 
 
 
--Describe probability as a foundation of statistical modeling, including inference and maximum likelihood estimation
+# Course objective"Describe probability as a foundation of statistical modeling, including inference and maximum likelihood estimation"
 
-# Course Objective:
 
-## Determine and apply the appropriate generalized linear model for a specific data context
+## Showing "Decribe probablity as a foundation of statistical modeling, including inference and maximum likelihood esitmation":
 
-### showing the course objective:
+### for this show I am using Activity 6 which I will also use later in my project:
 
-for this learning objective activity 6 is demonstrating using the appropriate glm for a specfic data context.
+
+
 ```{r include=FALSE}
 
 
@@ -101,14 +103,104 @@ roughly .069 or exp(-2.675)
 and the probability is .064 of getting called back
 
 linear, trying to fit some sort of a line for some link function 
-explore the data and then say the data means this so thats why I chose this model
+explore the data and then say the data means this so that's why I chose this model
 
+
+
+## Telling "Decribe probablity as a foundation of statistical modeling, including inference and maximum likelihood esitmation":
+
+Probability is a foundation of statistical modeling and with probability it guides us when dealing with model selection and assessment. Probability does that by helping us get a better understanding of our data and one way is inference. When dealing with data it is good to utilize inference to help you with model selection and understanding what are data is doing. For example we can infer from different statistics in our data set how the data is distributed and use inference to compare it to other data sets we are working on. Another way to inference is creating exploratory graphs like in the above example we can infer from the bar graph a majority of people do not receive callbacks.
+
+Another way probability is foundational to statistical modeling is it can be used in maximum likelihood estimation which can help us fit models. In the above example we can look at the coefficients of the model as they represent the maximum likelihood estimates for the model. In this example it is -2.675 which we can calculate the odds in above and understand that its roughly .069 likelihood to be called back.
+
+You can also see in the above activity we calculate the probability of .064 of getting called back, probability helps us interpret the results from our model to understand and infer different results when applying to like data situations.
+
+
+
+
+
+
+
+
+
+# Course Objective:
+
+## Determine and apply the appropriate generalized linear model for a specific data context
+
+### showing the course objective:
+
+for this learning objective activity 6 is demonstrating using the appropriate glm for a specific data context. Again I'm using activity 6 above which I used above but I think this activity demonstrates selecting based on a specific data context. I'm also using Activity 3 to demonstrate another scenario of picking a glm for a specific data context.
+
+```{r}
+autos <- read_csv("Automobile.csv")
+```
+Is this an observational study or an experiment?
+I believe this is from an observational study
+
+
+You will need to create appropriate univariate graphs to help in answering this:
+
+Describe the distribution of your response variable. Is the distribution skewed? Are there any other interesting/odd features (outliers, multiple peaks, etc.)? What does that tell you about countries’ personal freedoms? Is this what you expected to see? Why, or why not?
+```{r}
+ggplot(autos, aes(x = mpg)) +
+  geom_histogram(fill = "lightblue", color = "black", bins = 30) +
+  labs(x = "mpg", y = "Frequency", title = "Distribution of mpg in Autos dataset")
+```
+
+
+
+
+Excluding your response variable, select two other numeric variables (hint: look for <dbl> or <int> designations) and describe their relationship with each other using an appropriate visualization.
+
+```{r}
+ggplot(autos, aes(x = weight, y = horsepower)) +
+  geom_point(color = "#2E8B57", size = 3, alpha = 0.7) +
+  labs(x = "Weight", y = "Horsepower", title = "Scatter Plot of Weight vs. Horsepower") +
+  theme_minimal() +
+  theme(
+    plot.background = element_rect(fill = "lightgray"),
+    panel.grid.major = element_line(color = "white"),
+    panel.grid.minor = element_blank(),
+    axis.line = element_line(color = "black"),
+    axis.text = element_text(color = "black"),
+    axis.title = element_text(color = "black", size = 12, face = "bold"),
+    plot.title = element_text(size = 14, face = "bold")
+  )
+
+```
+```{r}
+autos %>% 
+  select(mpg, weight, horsepower) %>% 
+  ggpairs()
+```
+For each pair of variables, how would you describe the relationship graphically? Do any of the relationships look linear? Are there any interesting/odd features (outliers, non-linear patterns, etc.)?
+Horsepower and weight look linear? Nothing odd in these graphs?
+For each pair of variables, how would you describe the relationship numerically?
+roughly linear relationships?
+Are your two explanatory variables collinear (correlated)? Essentially, this means that adding more than one of these variables to the model would not add much value to the model. We will talk more on this issue in Activity 4 (other considerations in regression models).
+It looks like they are correlated?
+
+```{r}
+lm_spec <- linear_reg() %>%
+set_mode("regression") %>%
+set_engine("lm")
+
+lm_spec
+
+mlr_mod <- lm_spec %>% 
+fit(mpg ~ weight + horsepower, data = autos)
+
+tidy(mlr_mod)
+```
 
 
 # Describing the learning objective "Determine and apply the appropriate generalized linear model for a specific data context":
 
-For this learning objective I am using activity 6 to show the determining and applying the appropriate generalized linear model. For this data set it is appropriate to use logistic regression because we have a binary outcome variable. The variable is received_callback which is either a 1 for yes or 0 for no that indicates if a person who submitted there resume received a callback. For the application of this model you can see I first used exploratory graphs to get an understanding of my data set. I think created a table to further analyze my data before approaching this problem. After the initial analysis and more calculating probability and odds I then fit the logistic regression model using glm and passing the binomial attribute. 
+For this learning objective I am using activity 6 to show the determining and applying the appropriate generalized linear model. For this data set it is appropriate to use logistic regression because we have a binary outcome variable. The variable is received_callback which is either a 1 for yes or 0 for no that indicates if a person who submitted there resume received a callback.
 
+For the application of this model you can see I first used exploratory graphs to get an understanding of my data set. I created a table to further analyze my data before approaching this problem. After the initial analysis and more calculating probability and odds I then fit the logistic regression model using glm and passing the binomial attribute. 
+
+I also use activity 3 above to show the right application for a MLR model. The data situation was multiple explanatory variables and one continues response variable. The activity 3 showed mpg in relation to weight and horsepower and showed the relationship between the two.
 
 
 ## Course Objective "Conduct model selection for a set of candidate models"
@@ -410,7 +502,9 @@ knitr::include_graphics("Comparing to null.PNG")
 
 ### describing the objective "Communicate the results of statistical models to a general audience":
 
-I used mini competition 1 because here I think I (and my team) were able to most effectively communicate to a general audience out of any of the course work. With this example above and other activities in class I think it really sharpened my confidence and ability to express models to a general audience. Specifically above I broke down our process of getting to our model and it's results hopefully in an effective manner. Another example I could've used was from mini project 2, which I also have above. In that example I have the quantities that I predict will be sold in the next two weeks and communicate that to the audience. 
+I used mini competition 1 because here I think I (and my team) were able to most effectively communicate to a general audience out of any of the course work. With this example above and other activities in class I think it really sharpened my confidence and ability to express models to a general audience.
+
+Specifically above I broke down our process of getting to our model and it's results hopefully in an effective manner. Another example I could've used was from mini project 2, which I also have above. In that example I have the quantities that I predict will be sold in the next two weeks and communicate that to the audience. 
 
 
 
@@ -422,7 +516,9 @@ please see above examples of using R to fit and assess models.
 
 ### describing the objective "Use programming software (i.e., R) to fit and assess statistical models":
 
-Throughout the class I successfully using many different methods in R to fit and assess statistical models. The class activities and in particular the mini compentitions really help push my widen my knowledge of R. I'm feeling extremely conformable after this course to fit and assess models using R, before this class I would've said the only programming software I'm comfortable doing this was SAS.
+Throughout the class I successfully using many different methods in R to fit and assess statistical models. The class activities and in particular the mini competitions really help push my widen my knowledge of R. I'm feeling extremely conformable after this course to fit and assess models using R, before this class I would've said the only programming software I'm comfortable doing this was SAS.
+
+In specific ways during class we fit models for SLR, MLR, logistic regression, ARIMA, and poisson. and for assessment there are different methods of analyzing the results of these models to show the effectiveness. I think the mini-projects were best at showing assessment, it left us on our own (with a group) to assess our models.
 
 
 
@@ -430,10 +526,18 @@ Throughout the class I successfully using many different methods in R to fit and
 
 ## reflection on growth:
 
+I think this class help immensely with my growth in R and fitting and assessing models. Previously to this class I would say I was not extremely comfortable in assessing models in R and this class really helped me dig deeper into that and become more comfortable.
 
+I also think this class really helped me grow in understanding effective ways to tackle solutions and work. For other classes that are more lecture heavy I have a really sporadic working schedule on coursework but with the ability to work during class time it allowed me to get a schedule and stick to it which was very helpful in teaching me good working habits.
 
+This class also challenged my growth with reading of Data Feminism. I think that book is a very powerful book and was very successful at challenge some misconceptions I had and think deeper about how the field of Data Science effects broad populations of individuals.
+
+Another thing that lead to growth was this final project. I initially set out to make a website and begin working on a way to show off what I've learned through this class and in R to build on to later be my portfolio. But through time constraints and acknowledging my limitations in making websites with R I decided to create this PDF instead. This was a good lesson for me to assess were I'm at and how much I can realistically do with the time I have available.
 
 ## Reflection on participation in community:
 
-I attended every class and participated fully with my peers in each breakout session. I wanted to speak up more online but I didn't feel very comfortable with the class being both in person and online so I didn't speak that often. I feel like some of my best participation was on the group assignments. For the first one I worked very succesfully with my teamates to coordinate and contribute meaningfully in discussions. For the second activity I was the driving force in getting my team to meet and work on the project.
+I attended every class and participated fully with my peers in each breakout session. I wanted to speak up more online but I didn't feel very comfortable with the class being both in person and online so I didn't speak that often. I feel like some of my best participation was on the group assignments. 
+
+For the first one I worked very successfully with my teammates to coordinate and contribute meaningfully in discussions. For the second activity I was the driving force in getting my team to meet and work on the project.
+
 
