@@ -11,6 +11,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(tidymodels)
+library(forecast)
 ```
 
 
@@ -110,21 +111,27 @@ For this learning objective I am using activity 6 to show the determining and ap
 
 
 
-## Course Objective "Conduct model selection for a set of candidate models
+## Course Objective "Conduct model selection for a set of candidate models"
 
 I will be showing this course objective through mini project 2 - this project really challenged me to select the right model out of all the glm and for the in class assignment I actually selected and fitted the incorrect model. After reflection from seeing other students presentations I then selected the appropriate model:
 
 ```{r}
-sales <- read.csv("data/inventory.csv")
+sales <- read.csv("Data/inventory.csv")
 
-View(sales)
 ```
+
+
+
+Here I am plotting the raw data of sales by week to start to understand the data to make model selection:
 
 ```{r}
 ggplot(sales, aes(x = week, y = sold)) +
   geom_line() +
   labs(x = "Week", y = "Units Sold", title = "Sales Over Time")
 ```
+
+
+additional plots to understand the data:
 
 ```{r}
 total_sales <- sales %>% 
@@ -135,12 +142,20 @@ ggplot(total_sales, aes(x = item_no, y = total_sold)) +
   geom_bar(stat = "identity", fill = "steelblue") +
   labs(x = "Item Number", y = "Total Units Sold", title = "Total Sales per Item")
 ```
+
+
+additional plots:
+
 ```{r}
 ggplot(total_sales, aes(x = reorder(item_no, total_sold), y = total_sold)) +
   geom_bar(stat = "identity", fill = "steelblue") +
   labs(x = "Item Number", y = "Total Units Sold", title = "Total Sales per Item (Largest to Smallest)") +
   coord_flip()
 ```
+
+
+Here I filter down the data to help with my model selection:
+
 ```{r}
 total_sales <- sales %>% 
   group_by(item_no) %>% 
@@ -156,12 +171,10 @@ ggplot(total_sales, aes(x = reorder(item_no, total_sold), y = total_sold)) +
 ```
 
 
-```{r}
-#unique_items <- unique(sales$item_no)
+Here I'm printing the list of items I want to use in my model
 
-# Print the unique count of item numbers
-#cat("List of unique item numbers:\n")
-#print(unique_items)
+```{r}
+
 
 
 unique_high_sales <- unique(total_sales$item_no)
@@ -188,6 +201,10 @@ ggplot(filtered_sales, aes(x = week, y = sold)) +
   geom_line() +
   labs(x = "Week", y = "Units Sold", title = "Sales Over Time")
 ```
+
+
+### here was my first model I selected that was incorrect and did not help me reach the results I wanted:
+
 ```{r}
 
 
@@ -210,12 +227,194 @@ summary(predicted_sales)
 
 ```
 
+### after classmate presentations here I selected an ARIMA model to fit which I felt was more appropriate candidate model to help predict.
+
+
+
+here I aggregate the data by week and item number on my data set:
+```{r}
+
+aggregated_sales <- aggregate(sold ~ week + item_no, data = filtered_sales, sum)
+
+```
+
+here I am creating the time series:
+```{r}
+
+sales_ts <- ts(aggregated_sales$sold, frequency = 52) 
+
+tsdisplay(sales_ts)
+
+```
+
+
+
+Creating the arima model:
+
+```{r}
+
+arima_model <- Arima(sales_ts, order = c(1, 1, 1))
+
+```
+
+
+predicting the next two weeks for all items:
+
+
+```{r}
+forecast_result <- forecast(arima_model, h = 2)
+
+
+print(forecast_result$mean)
+```
+
+## Describing course objective Conduct model selection for a set of candidate models":
+
+In the above you can see me trying out two different models and me iterating through to what I believe was the correct model (after some help from the awesome presentations my classmates gave). This demonstrates the course objective because you can see me iterate through the process of selecting the correct model for a given set of data. For this example I ran through a whole entire poisson model and then heard the feedback from you and my classmates which help guide me in selecting the better model from the candidate models. I think this will parallel who I'll approach selecting models professionally, it will be a largely iterative process with help from mentors and peers to land on a better model to help me demonstrate the results I want.
+
 
 ## Course Objective "Communicate the results of statistical models to a general audience 
 
+For this course objective I feel like mini project 1 worked best to illustrate communicate results of statisical models
+
+### showing "Communicating the results":
+
+Here is my work to non miniproject one to create and fit a MLR model:
+
+```{r}
+
+minidata<- read.csv("Miniprojectdata.csv")
+```
+
+```{r}
+head(minidata)
+```
+```{r}
+colnames(minidata)
+```
+
+writing out variable names to help with clarity and communcation later:
 
 
-## Use programming software (i.e., R) to fit and assess statistical models
+BASMID -> unique child identifier 
+ALLGRADEX -> current Grade
+EDCPUB-> Type of school - public
+SCCHOICE-> choice in school attendance
+SPUBCHOIX-> district allows school choice 
+SCONSIDR-> other schools considered
+SCHLHRSWK-> hours attend school each week
+EINTNET-> child enrolled in online or cyber classes
+MOSTIMPT-> most important reason for online, virtual, or cyber enrollment
+INTNUM->number of online courses
+SEENJOY-> child enjoyment of school
+SEGRADES-> Child's grades
+SEABSNT-> Days absent
+SEGRADEQ-> Description of coursework
+FSSPORTX-> participation in school activities - attend a school event
+FSVOL-> participation in school activities - as a volunteer
+FSMTNG->participation in school activities - attend a meeting
+FSPTMTNGΩ->	participation in school activities - attend a parent-teacher meeting
+FSATCNFN-> participation in school activities - attend a parent-teacher conference
+FSFUNDRS->participate in fundraising
+FSCOMMTE-> serve on school commitee
+FSCOUNSLR-> meet with counsler
+FSFREQ-> times participated in school meetings
+FSNOTESX->recieve notes or emails 
+FSMEMO-> receive newsletters
+
+creating exploratory graphs:
+
+
+
+```{r}
+ggplot(minidata, aes(x = SEGRADEQ)) +
+  geom_histogram(fill = "lightblue", color = "black", bins =6) +
+  labs(x = "Grade", y = "Frequency", title = "Histogram of Grade") +
+  theme_minimal()+
+  scale_x_continuous(breaks = seq(-1, 5, by = 1))
+
+ggplot(minidata, aes(x = SEENJOY)) +
+  geom_histogram(fill = "lightgreen", color = "black", bins =6) +
+  labs(x = "Grade", y = "Frequency", title = "Histogram of Grade") +
+  theme_minimal()+
+  scale_x_continuous(breaks = seq(-1, 5, by = 1))
+```
+
+
+fitting my mlr:
+
+
+```{r}
+
+model <- lm(SEGRADES ~ ALLGRADEX + EDCPUB + SCCHOICE + SCHLHRSWK + EINTNET + INTNUM + SEENJOY + SEABSNT + SEGRADEQ + FSSPORTX + FSVOL + FSMTNG + FSPTMTNG + FSATCNFN + FSFUNDRS + FSCOMMTE + FSCOUNSLR + FSFREQ + FSNOTESX + FSMEMO, data = minidata)
+
+# Print the model summary
+summary(model)
+
+```
+```{r}
+lm_spec <- linear_reg() %>%
+set_mode("regression") %>%
+set_engine("lm")
+
+lm_spec
+
+mlr_mod <- lm_spec %>% 
+fit(SEGRADES ~ ALLGRADEX + EDCPUB + SCCHOICE + SCHLHRSWK + EINTNET + INTNUM + SEENJOY + SEABSNT + SEGRADEQ + FSSPORTX + FSVOL + FSMTNG + FSPTMTNG + FSATCNFN + FSFUNDRS + FSCOMMTE + FSCOUNSLR + FSFREQ + FSNOTESX + FSMEMO, data = minidata)
+
+
+
+tidy(mlr_mod)
+```
+
+here are some snips from our slides and I'll show how I would have communicated in my presentation:
+
+first when we went to communicate this model we wanted to go through the lens of how we interpreted the question and how we build the model
+
+* we interpreted the question as how to help parents have there kids be successful
+* took out variables that we deemed weren't in the parents control
+* expressed that grades were the response variable
+
+
+in this slide below, it's going through a couple of graphs we used to explore the data. These graphs are particularly important because it shows the some of the variables responses we were dealing with and a all of them were done as a survey with response ranging from -1 to 5 for the most part:
+
+```{r} 
+
+knitr::include_graphics("exploration.PNG") 
+
+```
+
+here is the first model we ran that demonstrates our model equation:
+
+```{r}
+knitr::include_graphics("updated model.PNG") 
+```
+
+
+here is the model equation which shows the impact the other variables had on SEGRADES. This equation is particulary imporatant because it shows the results of our model and how are variables impact SEGRADES:
+
+```{r}
+knitr::include_graphics("model equation.PNG") 
+```
+
+here is the final step we did to compare our model to the null model which is done to show how successful our model was. With our model showing all variables as significant this was an effective model for showing what parents could do to effect their students grades.
+
+```{r}
+knitr::include_graphics("Comparing to null.PNG") 
+```
+
+
+
+
+
+
+### describing the objective "Communicate the results of statistical models to a general audience":
+
+I used mini competition 1 because here I think I (and my team) were able to most effectively communicate to a general audience out of any of the course work. With this example above and other activities in class I think it really sharpened my confidence and ability to express models to a general audience. Specifically above I broke down our process of getting to our model and it's results hopefully in an effective manner. Another example I could've used was from mini project 2, which I also have above. In that example I have the quantities that I predict will be sold in the next two weeks and communicate that to the audience. 
+
+
+
+## Curse objective "Use programming software (i.e., R) to fit and assess statistical models:
 
 ### Show:
 
