@@ -362,7 +362,9 @@ print(forecast_result$mean)
 
 ## Describing course objective Conduct model selection for a set of candidate models":
 
-In the above you can see me trying out two different models and me iterating through to what I believe was the correct model (after some help from the awesome presentations my classmates gave). This demonstrates the course objective because you can see me iterate through the process of selecting the correct model for a given set of data. For this example I ran through a whole entire poisson model and then heard the feedback from you and my classmates which help guide me in selecting the better model from the candidate models. I think this will parallel who I'll approach selecting models professionally, it will be a largely iterative process with help from mentors and peers to land on a better model to help me demonstrate the results I want.
+In the above you can see me trying out two different models and me iterating through to what I believe was the correct model (after some help from the awesome presentations my classmates gave). This demonstrates the course objective because you can see me iterate through the process of selecting the correct model for a given set of data. 
+
+For this example I ran through a whole entire poisson model and then heard the feedback from you and my classmates which help guide me in selecting the better model from the candidate models. I think this will parallel who I'll approach selecting models professionally, it will be a largely iterative process with help from mentors and peers to land on a better model to help me demonstrate the results I want.
 
 
 ## Course Objective "Communicate the results of statistical models to a general audience 
